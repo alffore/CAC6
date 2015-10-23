@@ -10,6 +10,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <math.h>
+#include <libpq-fe.h>
 
 #ifndef CAC6_H
 #define	CAC6_H

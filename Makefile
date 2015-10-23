@@ -16,9 +16,9 @@ CFLAGS= -O3 -Wall
 LIBS= -lm -lpq -lpthread
 
 OBJ= main.o \
-	algoritmo.o \
-	recuperaInfoL.o \
-    recuperaInfoR.o   
+recuperaInfoL.o \
+recuperaInfoR.o \
+algoritmo.o   
 	
 	
 
@@ -27,7 +27,7 @@ DIR_SRC=./src/
 DIR_BIN=./bin/
 
 all: clean $(OBJ)
-	$(CLINKER) $(DIR_BIN)CAC3.exe $(OBJ) $(LIBS) $(CFLAGS)
+	$(CLINKER) $(DIR_BIN)CAC6.exe $(OBJ) $(LIBS) $(CFLAGS)
 
 
 %.o: $(DIR_SRC)%.c

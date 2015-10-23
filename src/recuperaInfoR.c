@@ -9,7 +9,7 @@ extern int *rec_clave;
 extern double *rec_lat;
 extern double *rec_lon;
 extern int *rec_id;
-extern int *itipo;
+extern int *rec_itipo;
 int cantrec;
 
 
@@ -19,7 +19,6 @@ int recuperaInfoRC(char * sarchivo) {
 
    	int i=0;
     
-
     int id, edo_id, mun_id, loc_id;
     double lat, lon;
     char stipo[20];
@@ -30,9 +29,9 @@ int recuperaInfoRC(char * sarchivo) {
 
         
         *(rec_clave+i)=(edo_id*100+mun_id)*1000+loc_id;
-        *(rec_lat+i)=lat;
-        *(rec_lon+i)=lon;
-        *(rec_itipo)=obtenClaveRec(stipo);
+        *(rec_lat+i)=M_PI*lat/180.0;
+        *(rec_lon+i)=M_PI*lon/180.0;
+        *(rec_itipo+i)=obtenClaveRec(stipo);
         *(rec_id+i)=id;
         
        
@@ -40,7 +39,7 @@ int recuperaInfoRC(char * sarchivo) {
     }
     printf("cuentaRec: %d\n", i);
     fclose(fh);
-    return cuentaRec;
+    return i;
 }
 
 
@@ -115,5 +114,5 @@ int obtenClaveRec(char * stipo){
         return zona_arqueologica;   
     }
   
-    
+    return -1;
 }

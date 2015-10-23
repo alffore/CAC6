@@ -17,9 +17,6 @@ extern int cantloc;
  */
 int recuperaInfoLoc(char * sarchivo) {
 
-    
-    PLocalidad pr = PLr;
-
     int edo_id, mun_id, loc_id, pob;
     double lat, lon;
     int i=0;
@@ -31,8 +28,8 @@ int recuperaInfoLoc(char * sarchivo) {
         if (fscanf(fh, "%d %d %d %lf %lf %d", &edo_id, &mun_id, &loc_id, &lat, &lon, &pob) != 6) break;
         
         *(loc_clave+i)=(edo_id*100+mun_id)*1000+loc_id;
-        *(loc_lat+i)=lat;
-        *(loc_lon+i)=lon;
+        *(loc_lat+i)=M_PI*lat/180.0;
+        *(loc_lon+i)=M_PI*lon/180.0;
         *(loc_pob+i)=pob;
 
         i++;

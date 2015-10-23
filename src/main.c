@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 	
 	
 	
-	liberaMemRec()
+	liberaMemRec();
 	liberaMemLoc();
 	
 	return (EXIT_SUCCESS);
@@ -60,7 +60,7 @@ int main(int argc, char** argv){
 /**
 *
 */
-void asignaMemLoc(){
+void asignaMemLoc(void){
 	
 	loc_clave=(int *) malloc(sizeof(int)*cantloc);
 	loc_pob=(int *) malloc(sizeof(int)*cantloc);
@@ -82,7 +82,10 @@ void liberaMemLoc(void){
 	if(loc_lon!=NULL)free(loc_lon);
 }
 
-void asignaMemRec(){
+/**
+*
+*/
+void asignaMemRec(void){
 	rec_clave=(int *) malloc(sizeof(int)*cantrec);
 	rec_id=(int *) malloc(sizeof(int)*cantrec);
 	rec_itipo=(int *) malloc(sizeof(int)*cantrec);
@@ -91,8 +94,10 @@ void asignaMemRec(){
 	rec_lon=(double *)malloc(sizeof(double)*cantrec);
 }
 
-
-void liberaMemRec(){
+/**
+*
+*/
+void liberaMemRec(void){
 	
 	if(rec_clave!=NULL)free(rec_clave);
 	if(rec_id!=NULL)free(rec_id);
