@@ -41,7 +41,7 @@ int main(int argc, char** argv){
 	
 	if(argc<5){
 		fprintf(stderr,"Error: parámetros incompletos (%d)\n",argc);
-		return (EXIT_FAIL);
+		return (EXIT_FAILURE);
 	}
 	
 	cantloc=atoi(*(argv+1));
