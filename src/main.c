@@ -39,6 +39,11 @@ extern int recuperaInfoRC(char * sarchivo);
 int main(int argc, char** argv){
 	
 	
+	if(argc<5){
+		fprintf(stderr,"Error: parámetros incompletos (%d)\n",argc);
+		return (EXIT_FAIL);
+	}
+	
 	cantloc=atoi(*(argv+1));
 	cantrec=atoi(*(argv+2));
 	
@@ -46,7 +51,8 @@ int main(int argc, char** argv){
 	asignaMemRec();
 	
 	
-	
+	recuperaInfoLoc(*(argv+3));
+	recuperaInfoRC(*(argv+4));
 	
 	
 	

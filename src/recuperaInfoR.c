@@ -10,7 +10,7 @@ extern double *rec_lat;
 extern double *rec_lon;
 extern int *rec_id;
 extern int *rec_itipo;
-int cantrec;
+extern int cantrec;
 
 
 
