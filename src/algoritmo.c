@@ -116,6 +116,14 @@ void algoritmo(void) {
 
 
         }
+        
+/*
+        for (t = 0; t < NUM_THREADS; t++) {
+            
+            pthread_join(threads[t], NULL);
+        }
+*/
+        
     }
 
     cierraArchivo();
@@ -197,9 +205,9 @@ void insertaDato(int i_loc, int* j_rec, double* dmin, int th) {
       }
      */
 
-    int localidad_id = *(loc_clave + i_loc)-(int) floor(*(loc_clave + i_loc) / 1000)*1000;
-    int estado_id = (int) (*(loc_clave + i_loc) / 1000000);
-    int municipio_id = (int) (*(loc_clave + i_loc) - estado_id * 1000000 - localidad_id) / 1000;
+    int localidad_id = *(loc_clave + i_loc)-(int) floor(*(loc_clave + i_loc) / 10000)*10000;
+    int estado_id = (int) (*(loc_clave + i_loc) / 10000000);
+    int municipio_id = (int) (*(loc_clave + i_loc) - estado_id * 10000000 - localidad_id) / 10000;
 
     int localidadd_id = 0;
     int municipiod_id = 0;
@@ -210,11 +218,11 @@ void insertaDato(int i_loc, int* j_rec, double* dmin, int th) {
 
         j = *(j_rec + i);
 
-        localidadd_id = *(rec_clave + j)-(int) floor(*(rec_clave + j) / 1000)*1000;
-        estadod_id = (int) (*(rec_clave + j) / 1000000);
-        municipiod_id = (int) (*(rec_clave + j) - estadod_id * 1000000 - localidadd_id) / 1000;
+        localidadd_id = *(rec_clave + j)-(int) floor(*(rec_clave + j) / 10000)*10000;
+        estadod_id = (int) (*(rec_clave + j) / 10000000);
+        municipiod_id = (int) (*(rec_clave + j) - estadod_id * 10000000 - localidadd_id) / 10000;
 
-        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n", estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
+        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n",estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
 
     }
 

@@ -26,7 +26,7 @@ int recuperaInfoLoc(char * sarchivo) {
     while (!feof(fh)) {
         if (fscanf(fh, "%d %d %d %lf %lf %d", &edo_id, &mun_id, &loc_id, &lat, &lon, &pob) != 6) break;
 
-        *(loc_clave + i) = (edo_id * 1000 + mun_id)*1000 + loc_id;
+        *(loc_clave + i) = (edo_id * 1000 + mun_id)*10000 + loc_id;
         *(loc_lat + i) = M_PI * lat / 180.0;
         *(loc_lon + i) = M_PI * lon / 180.0;
         *(loc_pob + i) = pob;

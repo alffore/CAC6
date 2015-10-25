@@ -30,7 +30,7 @@ int recuperaInfoRC(char * sarchivo) {
         if (fscanf(fh, "%d %d %d %lf %lf %s %d", &edo_id, &mun_id, &loc_id, &lat, &lon, stipo, &id) != 7) break;
 
 
-        *(rec_clave + i) = (edo_id * 1000 + mun_id)*1000 + loc_id;
+        *(rec_clave + i) = (edo_id * 1000 + mun_id)*10000 + loc_id;
         *(rec_lat + i) = M_PI * lat / 180.0;
         *(rec_lon + i) = M_PI * lon / 180.0;
         *(rec_itipo + i) = obtenClaveRec(stipo);

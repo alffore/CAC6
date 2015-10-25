@@ -17,7 +17,7 @@
 #define	CAC6_H
 
 
-#define NUM_THREADS 20
+#define NUM_THREADS 2
 #define NUM_TEMAS 22
 
 enum {
