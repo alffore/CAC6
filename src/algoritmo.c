@@ -6,17 +6,18 @@
  */
 
 // variables de localidades
-
+extern int *loc_clave;
 extern double *loc_lat;
 extern double *loc_lon;
-
+extern int *loc_pob;
 extern int cantLocs;
 
 // variables de recursos
-
+extern int *rec_clave;
 extern double *rec_lat;
 extern double *rec_lon;
 extern int *rec_itipo;
+extern int *rec_id;
 extern int cantRecs;
 
 
@@ -25,6 +26,35 @@ extern int cantRecs;
 
 const double RT = 6378390.00;
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+FILE *fh;
+
+
+
+char* stipos[] = {
+    "auditorio",
+    "biblioteca",
+    "casa_c",
+    "centro_c",
+    "centro_cultural",
+    "fnme",
+    "fonoteca",
+    "fototeca",
+    "galeria",
+    "libreria",
+    "museo",
+    "museo_ant",
+    "museo_arq",
+    "museo_art",
+    "museo_cyt",
+    "museo_esp",
+    "museo_his",
+    "otra_bib",
+    "patrimonio_humanidad",
+    "teatro",
+    "universidad",
+    "zona_arqueologica",
+    "centro_educacion"
+};
 
 
 
@@ -39,9 +69,11 @@ PGresult *res = NULL;
 //declaracion de funciones
 void* calculoLocRec(void* parg);
 
-int abreConexionBD(void);
-int cierraConexionBD(void);
-void insertaDatoBD(int i, int* j, double* dmin, int th);
+
+void insertaDato(int i, int* j, double* dmin, int th);
+int abreArchivo(void);
+void cierraArchivo(void);
+
 
 void algoritmo(void);
 
@@ -51,7 +83,7 @@ void algoritmo(void);
  */
 void algoritmo(void) {
 
-   
+
 
     int iloc;
     pthread_t threads[NUM_THREADS];
@@ -61,12 +93,7 @@ void algoritmo(void) {
 
 
 
-    //abreConexionBD();
-
-
-
-
-
+    if (abreArchivo() == 1)return;
 
     for (iloc = 0; iloc < cantLocs; iloc += NUM_THREADS) {
 
@@ -91,10 +118,7 @@ void algoritmo(void) {
         }
     }
 
-
-
-
-    //cierraConexionBD();
+    cierraArchivo();
 
 
 }
@@ -149,13 +173,12 @@ void* calculoLocRec(void* parg) {
     }
 
 
+    // pthread_mutex_lock(&mutex1);
 
-    pthread_mutex_lock(&mutex1);
+    insertaDato(*loc_i, jmin, dmin, *(loc_i + 1));
 
+    // pthread_mutex_unlock(&mutex1);
 
-    insertaDatoBD(*loc_i, jmin, dmin, *(loc_i + 1));
-
-    pthread_mutex_unlock(&mutex1);
 
     pthread_exit(NULL);
 }
@@ -163,46 +186,62 @@ void* calculoLocRec(void* parg) {
 /**
  *
  */
-void insertaDatoBD(int i_loc, int* j_rec, double* dmin, int th) {
+void insertaDato(int i_loc, int* j_rec, double* dmin, int th) {
 
     int i;
-    printf("th: %d, i_loc: %d\n", th, i_loc);
-    for(i=0;i<=NUM_TEMAS;i++){
-        printf("\t j_rec:%d, dmin:%f\n",*(j_rec+i), *(dmin+i));
+
+    /*printf("th: %d, i_loc: %d\n", th, i_loc);*/
+    /*  for(i=0;i<=NUM_TEMAS;i++){
+          printf("\t j_rec:%d, dmin:%f\n",*(j_rec+i), *(dmin+i));
         
+      }
+     */
+
+    int localidad_id = *(loc_clave + i_loc)-(int) floor(*(loc_clave + i_loc) / 1000)*1000;
+    int estado_id = (int) (*(loc_clave + i_loc) / 1000000);
+    int municipio_id = (int) (*(loc_clave + i_loc) - estado_id * 1000000 - localidad_id) / 1000;
+
+    int localidadd_id = 0;
+    int municipiod_id = 0;
+    int estadod_id = 0;
+    int j = 0;
+
+    for (i = 0; i <= NUM_TEMAS; i++) {
+
+        j = *(j_rec + i);
+
+        localidadd_id = *(rec_clave + j)-(int) floor(*(rec_clave + j) / 1000)*1000;
+        estadod_id = (int) (*(rec_clave + j) / 1000000);
+        municipiod_id = (int) (*(rec_clave + j) - estadod_id * 1000000 - localidadd_id) / 1000;
+
+        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n", estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
+
     }
+
 
 }
 
 /**
- * @brief Función que abre una conexión a la BD
- *
- *
+ * 
+ * @return 
  */
-int abreConexionBD(void) {
+int abreArchivo(void) {
 
-    conn = PQconnectdb(scc);
-
-    if (PQstatus(conn) != CONNECTION_OK) {
-        fprintf(stderr, "Conexion a BD fallo: %s\n", PQerrorMessage(conn));
-        cierraConexionBD();
+    fh = fopen("salida.csv", "w");
+    if (fh == NULL) {
         return 1;
     }
 
+    fprintf(fh, "estado_id,municipio_id,localidad_id,recurso,pobtot,dist,estadod_id,municipiod_id,localidadd_id,recurso_id\n");
 
     return 0;
 }
 
 /**
- *@brief Función que cirra la conexión a la BD
  * 
  */
-int cierraConexionBD(void) {
-
-    if (conn != NULL) {
-        PQfinish(conn);
+void cierraArchivo() {
+    if (fh != NULL) {
+        fclose(fh);
     }
-
-
-    return 0;
 }
