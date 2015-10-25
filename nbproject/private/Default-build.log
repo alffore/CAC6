@@ -1,0 +1,16 @@
+gcc -c -O3 -Wall  src/main.c
+gcc -c -O3 -Wall  src/recuperaInfoL.c
+gcc -c -O3 -Wall  src/recuperaInfoR.c
+gcc -c -O3 -Wall  src/algoritmo.c
+src/algoritmo.c: En la función ‘algoritmo’:
+src/algoritmo.c:54:14: aviso: se define la variable ‘iret2’ pero no se usa [-Wunused-but-set-variable]
+  int  iret1, iret2;
+              ^
+src/algoritmo.c:54:7: aviso: se define la variable ‘iret1’ pero no se usa [-Wunused-but-set-variable]
+  int  iret1, iret2;
+       ^
+src/algoritmo.c: En la función ‘calculoLocRec’:
+src/algoritmo.c:152:1: aviso: el control alcanza el final de una función que no es void [-Wreturn-type]
+ }
+ ^
+gcc -o ./bin/CAC6.exe main.o recuperaInfoL.o recuperaInfoR.o algoritmo.o    -lm -lpq -lpthread -O3 -Wall
