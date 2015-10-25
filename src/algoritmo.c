@@ -3,7 +3,7 @@
 
 /*
 #define NUM_THREADS 20
-*/
+ */
 
 // variables de localidades
 
@@ -41,7 +41,7 @@ void* calculoLocRec(void* parg);
 
 int abreConexionBD(void);
 int cierraConexionBD(void);
-void insertaDatoBD(int i, int j, double dmin, int th);
+void insertaDatoBD(int i, int* j, double* dmin, int th);
 
 void algoritmo(void);
 
@@ -51,7 +51,7 @@ void algoritmo(void);
  */
 void algoritmo(void) {
 
-    int it;
+   
 
     int iloc;
     pthread_t threads[NUM_THREADS];
@@ -65,35 +65,34 @@ void algoritmo(void) {
 
 
 
-    for (it = 0; it < 23; it++) {
-
-
-        for (iloc = 0; iloc < cantLocs; iloc += NUM_THREADS) {
-
-            for (t = 0; t < NUM_THREADS; t++) {
-
-                int parg[3];
-                parg[0] = iloc + t;
-                parg[1] = it;
-                parg[2] = t;
-
-
-                //printf("thread: %d, iloc: %d, it: %d\n",t,parg[0],parg[1]);
-
-                if ((iret = pthread_create(&threads[t], NULL, calculoLocRec, (void*) parg))) {
-                    fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
-                }
-
-                pthread_join(threads[t], NULL);
 
 
 
+    for (iloc = 0; iloc < cantLocs; iloc += NUM_THREADS) {
 
+        for (t = 0; t < NUM_THREADS; t++) {
+
+            int parg[2];
+            parg[0] = iloc + t;
+            parg[1] = t;
+
+
+            //printf("thread: %d, iloc: %d, it: %d\n",t,parg[0],parg[1]);
+
+            if ((iret = pthread_create(&threads[t], NULL, calculoLocRec, (void*) parg))) {
+                fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
             }
+
+            pthread_join(threads[t], NULL);
+
+
+
+
         }
-
-
     }
+
+
+
 
     //cierraConexionBD();
 
@@ -104,16 +103,17 @@ void algoritmo(void) {
  * @brief Hilo de cálculo 
  */
 void* calculoLocRec(void* parg) {
-    int j = 0, jmin = 0;
+    int j = 0;
+    int jmin[NUM_TEMAS];
 
     //recupera el indice y el tipo de recurso
     int* loc_i = (int *) parg;
-    int itipo = *(loc_i + 1);
+    int itipo = 0;
 
     if (*loc_i >= cantLocs)pthread_exit(NULL);
 
-    double daux=RT;
-    double dmin=RT;
+    double daux = RT;
+    double dmin[NUM_TEMAS];
 
     double lat_i = *(loc_lat + *loc_i);
     double lon_i = *(loc_lon + *loc_i);
@@ -121,35 +121,39 @@ void* calculoLocRec(void* parg) {
     double lat_j = 0;
     double lon_j = 0;
 
-   
+
+    for (j = 0; j <= NUM_TEMAS; j++) {
+        dmin[j] = RT;
+    }
+
 
     for (j = 0; j < cantRecs; j++) {
 
-        if (*(rec_itipo + j) == itipo) {
-            
-            lat_j = *(rec_lat + j);
-            lon_j = *(rec_lon + j);
+        itipo = *(rec_itipo + j);
 
-            daux = sin(lat_i) * sin(lat_j);
-            daux += cos(lat_i) * cos(lon_i) * cos(lat_j) * cos(lon_j);
-            daux += cos(lat_i) * sin(lon_i) * cos(lat_j) * sin(lon_j);
+        lat_j = *(rec_lat + j);
+        lon_j = *(rec_lon + j);
 
-            daux = (daux > 1) ? 1 : (daux<-1) ? -1 : daux;
-            daux = RT * acos(daux);
+        daux = sin(lat_i) * sin(lat_j);
+        daux += cos(lat_i) * cos(lon_i) * cos(lat_j) * cos(lon_j);
+        daux += cos(lat_i) * sin(lon_i) * cos(lat_j) * sin(lon_j);
 
-            if (daux < dmin) {
-                dmin = daux;
-                jmin = j;
-            }
+        daux = (daux > 1) ? 1 : (daux<-1) ? -1 : daux;
+        daux = RT * acos(daux);
+
+        if (daux < dmin[itipo]) {
+            dmin[itipo] = daux;
+            jmin[itipo] = j;
         }
+
     }
 
 
 
     pthread_mutex_lock(&mutex1);
 
-   // printf("th: %d, i_loc: %d, j_rec:%d, dmin:%f, tipo: %d cals:%f\n", *(loc_i + 2), *loc_i, jmin, dmin,itipo,daux);
-    insertaDatoBD(*loc_i, jmin, dmin, *(loc_i + 2));
+
+    insertaDatoBD(*loc_i, jmin, dmin, *(loc_i + 1));
 
     pthread_mutex_unlock(&mutex1);
 
@@ -159,9 +163,14 @@ void* calculoLocRec(void* parg) {
 /**
  *
  */
-void insertaDatoBD(int i_loc, int j_rec, double dmin, int th) {
+void insertaDatoBD(int i_loc, int* j_rec, double* dmin, int th) {
 
-    printf("th: %d, i_loc: %d, j_rec:%d, dmin:%f\n", th, i_loc, j_rec, dmin);
+    int i;
+    printf("th: %d, i_loc: %d\n", th, i_loc);
+    for(i=0;i<=NUM_TEMAS;i++){
+        printf("\t j_rec:%d, dmin:%f\n",*(j_rec+i), *(dmin+i));
+        
+    }
 
 }
 

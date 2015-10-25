@@ -11,7 +11,7 @@ CC= gcc -c
 
 CLINKER= gcc -o
 
-CFLAGS= -O3 -Wall
+CFLAGS= -O -Wall
 
 LIBS= -lm -lpq -lpthread
 
@@ -39,7 +39,6 @@ docs: borradocs
 
 
 borradocs:
-
 	@rm -rf docs/html
 	
 

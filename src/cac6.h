@@ -18,6 +18,7 @@
 
 
 #define NUM_THREADS 20
+#define NUM_TEMAS 22
 
 enum {
     auditorio,
@@ -44,6 +45,7 @@ enum {
     zona_arqueologica,
     centro_educacion
 };
+
 
 
 
