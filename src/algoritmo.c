@@ -1,9 +1,7 @@
 
 #include "cac6.h"
 
-/*
-#define NUM_THREADS 20
- */
+
 
 // variables de localidades
 extern int *loc_clave;
@@ -25,7 +23,6 @@ extern int cantRecs;
 
 
 const double RT = 6378390.00;
-pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 FILE *fh;
 
 
@@ -83,8 +80,6 @@ void algoritmo(void);
  */
 void algoritmo(void) {
 
-
-
     int iloc;
     pthread_t threads[NUM_THREADS];
     int t;
@@ -103,9 +98,6 @@ void algoritmo(void) {
             parg[0] = iloc + t;
             parg[1] = t;
 
-
-            //printf("thread: %d, iloc: %d, it: %d\n",t,parg[0],parg[1]);
-
             if ((iret = pthread_create(&threads[t], NULL, calculoLocRec, (void*) parg))) {
                 fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
             }
@@ -117,12 +109,7 @@ void algoritmo(void) {
 
         }
         
-/*
-        for (t = 0; t < NUM_THREADS; t++) {
-            
-            pthread_join(threads[t], NULL);
-        }
-*/
+
         
     }
 
@@ -181,11 +168,10 @@ void* calculoLocRec(void* parg) {
     }
 
 
-    // pthread_mutex_lock(&mutex1);
 
     insertaDato(*loc_i, jmin, dmin, *(loc_i + 1));
 
-    // pthread_mutex_unlock(&mutex1);
+
 
 
     pthread_exit(NULL);
@@ -197,13 +183,6 @@ void* calculoLocRec(void* parg) {
 void insertaDato(int i_loc, int* j_rec, double* dmin, int th) {
 
     int i;
-
-    /*printf("th: %d, i_loc: %d\n", th, i_loc);*/
-    /*  for(i=0;i<=NUM_TEMAS;i++){
-          printf("\t j_rec:%d, dmin:%f\n",*(j_rec+i), *(dmin+i));
-        
-      }
-     */
 
     int localidad_id = *(loc_clave + i_loc)-(int) floor(*(loc_clave + i_loc) / 10000)*10000;
     int estado_id = (int) (*(loc_clave + i_loc) / 10000000);
