@@ -80,35 +80,33 @@ void algoritmo(void);
  */
 void algoritmo(void) {
 
-    int iloc;
     pthread_t threads[NUM_THREADS];
-    int t;
-    int iret;
 
+    int iret;
+    int parg[2];
 
 
 
     if (abreArchivo() == 1)return;
 
-    for (iloc = 0; iloc < cantLocs; iloc += NUM_THREADS) {
+    parg[0] = 0;
+    parg[1] = NUM_THREADS;
 
-        for (t = 0; t < NUM_THREADS; t++) {
-
-            int parg[2];
-            parg[0] = iloc + t;
-            parg[1] = t;
-
-            if ((iret = pthread_create(&threads[t], NULL, calculoLocRec, (void*) parg))) {
-                fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
-            }
-
-
-            pthread_join(threads[t], NULL);
-            
-        }
-        
-        
+    if ((iret = pthread_create(&threads[0], NULL, calculoLocRec, (void*) parg))) {
+        fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
     }
+
+    parg[0] = 1;
+    parg[1] = NUM_THREADS;
+
+    if ((iret = pthread_create(&threads[1], NULL, calculoLocRec, (void*) parg))) {
+        fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
+    }
+
+
+    pthread_join(threads[0], NULL);
+    pthread_join(threads[1], NULL);
+
 
     cierraArchivo();
 
@@ -122,55 +120,54 @@ void* calculoLocRec(void* parg) {
     int j = 0;
     int jmin[NUM_TEMAS];
 
-    //recupera el indice y el tipo de recurso
-    int* loc_i = (int *) parg;
+    int i = 0;
+    int *inicio = (int*)parg;
+    int paso = *(inicio+1);
     int itipo = 0;
-
-    if (*loc_i >= cantLocs)pthread_exit(NULL);
 
     double daux = RT;
     double dmin[NUM_TEMAS];
 
-    double lat_i = *(loc_lat + *loc_i);
-    double lon_i = *(loc_lon + *loc_i);
+    double lat_i = 0;
+    double lon_i = 0;
 
     double lat_j = 0;
     double lon_j = 0;
 
 
-    for (j = 0; j <= NUM_TEMAS; j++) {
-        dmin[j] = RT;
-    }
+    for (i = *inicio; i < cantLocs; i += paso) {
 
+        lat_i = *(loc_lat + i);
+        lon_i = *(loc_lon + i);
 
-    for (j = 0; j < cantRecs; j++) {
-
-        itipo = *(rec_itipo + j);
-
-        lat_j = *(rec_lat + j);
-        lon_j = *(rec_lon + j);
-
-        daux = sin(lat_i) * sin(lat_j);
-        daux += cos(lat_i) * cos(lon_i) * cos(lat_j) * cos(lon_j);
-        daux += cos(lat_i) * sin(lon_i) * cos(lat_j) * sin(lon_j);
-
-        daux = (daux > 1) ? 1 : (daux<-1) ? -1 : daux;
-        daux = RT * acos(daux);
-
-        if (daux < dmin[itipo]) {
-            dmin[itipo] = daux;
-            jmin[itipo] = j;
+        for (j = 0; j <= NUM_TEMAS; j++) {
+            dmin[j] = RT;
         }
 
+        for (j = 0; j < cantRecs; j++) {
+
+            itipo = *(rec_itipo + j);
+
+            lat_j = *(rec_lat + j);
+            lon_j = *(rec_lon + j);
+
+            daux = sin(lat_i) * sin(lat_j);
+            daux += cos(lat_i) * cos(lon_i) * cos(lat_j) * cos(lon_j);
+            daux += cos(lat_i) * sin(lon_i) * cos(lat_j) * sin(lon_j);
+
+            daux = (daux > 1) ? 1 : (daux<-1) ? -1 : daux;
+            daux = RT * acos(daux);
+
+            if (daux < dmin[itipo]) {
+                dmin[itipo] = daux;
+                jmin[itipo] = j;
+            }
+
+        }
+
+        insertaDato(i, jmin, dmin, *inicio);
+
     }
-
-
-
-    insertaDato(*loc_i, jmin, dmin, *(loc_i + 1));
-
-
-
-
     pthread_exit(NULL);
 }
 
@@ -198,7 +195,7 @@ void insertaDato(int i_loc, int* j_rec, double* dmin, int th) {
         estadod_id = (int) (*(rec_clave + j) / 10000000);
         municipiod_id = (int) (*(rec_clave + j) - estadod_id * 10000000 - localidadd_id) / 10000;
 
-        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n",estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
+        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n", estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
 
     }
 
