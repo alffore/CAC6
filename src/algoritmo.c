@@ -102,14 +102,11 @@ void algoritmo(void) {
                 fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
             }
 
+
             pthread_join(threads[t], NULL);
-
-
-
-
+            
         }
         
-
         
     }
 
