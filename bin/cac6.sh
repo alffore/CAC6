@@ -7,5 +7,5 @@ recs=`cat /var/www/html/renic/utiles/cac2/salida_ipc.txt|wc -l`
 
 #./CAC6.exe 4844 1654 ../datos_ex/salida_localidades_15.txt ../datos_ex/salida_ipc_15.txt
 
-./CAC6.exe $recs $locs ../datos_ex/salida_localidades.txt ../datos_ex/salida_ipc.txt
+./CAC6.exe $locs $recs /var/www/html/renic/utiles/cac2/salida_localidades.txt /var/www/html/renic/utiles/cac2/salida_ipc.txt 
 
