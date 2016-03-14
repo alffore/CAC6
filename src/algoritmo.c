@@ -1,4 +1,6 @@
-
+/**
+ * https://computing.llnl.gov/tutorials/pthreads/#Overview
+ */
 #include "cac6.h"
 
 
@@ -54,11 +56,6 @@ char* stipos[] = {
 };
 
 
-
-//variables locales DB
-
-const char scc[] = "hostaddr=127.0.0.1 port=5432 dbname=nuevadbrenic user=userrenic";
-
 PGconn *conn = NULL;
 PGresult *res = NULL;
 
@@ -104,19 +101,16 @@ void algoritmo(void) {
                 fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
             }
 
-        }
-
- 
+        } 
 
         for (t = 0; t < NUM_THREADS; t++) {
             iret = pthread_join(threads[t], &status);
             if (iret) {
-                printf("ERROR; return code from pthread_join() is %d\n", iret);
+                fprintf(stderr,"ERROR; return code from pthread_join() is %d\n", iret);
                 return;
             }
-            printf("Completed join with thread %d having a status of %ld\n", t, (long) status);
+            //printf("Completed join with thread %d having a status of %ld\n", t, (long) status);
         }
-
 
     }
     pthread_attr_destroy(&attr);
