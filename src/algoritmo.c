@@ -82,11 +82,13 @@ void algoritmo(void) {
 
     int iloc;
     pthread_t threads[NUM_THREADS];
+    pthread_attr_t attr;
     int t;
     int iret;
+    void *status;
 
-
-
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
     if (abreArchivo() == 1)return;
 
@@ -98,21 +100,29 @@ void algoritmo(void) {
             parg[0] = iloc + t;
             parg[1] = t;
 
-            if ((iret = pthread_create(&threads[t], NULL, calculoLocRec, (void*) parg))) {
+            if ((iret = pthread_create(&threads[t], &attr, calculoLocRec, (void*) parg))) {
                 fprintf(stderr, "error: pthread_create, iret: %d\n", iret);
             }
 
-
-            pthread_join(threads[t], NULL);
-            
         }
-        
-        
-    }
 
+ 
+
+        for (t = 0; t < NUM_THREADS; t++) {
+            iret = pthread_join(threads[t], &status);
+            if (iret) {
+                printf("ERROR; return code from pthread_join() is %d\n", iret);
+                return;
+            }
+            printf("Completed join with thread %d having a status of %ld\n", t, (long) status);
+        }
+
+
+    }
+    pthread_attr_destroy(&attr);
     cierraArchivo();
 
-
+    pthread_exit(NULL);
 }
 
 /**
@@ -198,7 +208,7 @@ void insertaDato(int i_loc, int* j_rec, double* dmin, int th) {
         estadod_id = (int) (*(rec_clave + j) / 10000000);
         municipiod_id = (int) (*(rec_clave + j) - estadod_id * 10000000 - localidadd_id) / 10000;
 
-        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n",estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
+        fprintf(fh, "%d,%d,%d,%s,%d,%.6f,%d,%d,%d,%d\n", estado_id, municipio_id, localidad_id, stipos[*(rec_itipo + j)], *(loc_pob + i_loc), *(dmin + i), estadod_id, municipiod_id, localidadd_id, *(rec_id + j));
 
     }
 
