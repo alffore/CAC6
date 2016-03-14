@@ -56,9 +56,6 @@ char* stipos[] = {
 };
 
 
-PGconn *conn = NULL;
-PGresult *res = NULL;
-
 
 //declaracion de funciones
 void* calculoLocRec(void* parg);
